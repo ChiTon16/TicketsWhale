@@ -1,0 +1,27 @@
+services:
+  # Database cho Identity Service
+  identity-db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: identity_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432" # Đẩy ra cổng 5433 để tránh trùng cổng mặc định
+
+  # Database cho Ticketing Service
+  ticketing-db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ticketing_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5434:5432" # Đẩy ra cổng 5434
+
+  # RabbitMQ cho việc gửi thông báo
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672" # Giao diện quản lý của RabbitMQ
