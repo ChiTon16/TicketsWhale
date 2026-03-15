@@ -1,0 +1,32 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: notification-service
+  rabbitmq:
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: guest
+    password: guest
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${SPRING_MAIL_USERNAME:lev160804clone@gmail.com}
+    password: ${SPRING_MAIL_PASSWORD:ekcb dork uaok zafp}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+app:
+  rabbitmq:
+    exchange: ticket.exchange
+    queue:
+      booking-confirmed: booking.confirmed.queue
+      booking-cancelled: booking.cancelled.queue
+    routing-key:
+      booking-confirmed: booking.confirmed
+      booking-cancelled: booking.cancelled

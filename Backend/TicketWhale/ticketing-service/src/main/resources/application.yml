@@ -1,0 +1,41 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: ticketing-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/ticketing_db}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:123456}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  rabbitmq:
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: guest
+    password: guest
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+
+jwt:
+  secret: ${JWT_SECRET:your-256-bit-secret-key-here-must-be-very-long-for-security}
+
+app:
+  rabbitmq:
+    exchange: ticket.exchange
+    queue:
+      booking-confirmed: booking.confirmed.queue
+      booking-cancelled: booking.cancelled.queue
+    routing-key:
+      booking-confirmed: booking.confirmed
+      booking-cancelled: booking.cancelled
+  booking:
+    hold-duration-minutes: 10

@@ -1,27 +1,147 @@
+
+
 services:
-  # Database cho Identity Service
-  identity-db:
-    image: postgres:15
-    environment:
-      POSTGRES_DB: identity_db
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-    ports:
-      - "5433:5432" # Đẩy ra cổng 5433 để tránh trùng cổng mặc định
 
-  # Database cho Ticketing Service
-  ticketing-db:
-    image: postgres:15
-    environment:
-      POSTGRES_DB: ticketing_db
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-    ports:
-      - "5434:5432" # Đẩy ra cổng 5434
+  # ==================== INFRASTRUCTURE ====================
 
-  # RabbitMQ cho việc gửi thông báo
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - ticket-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   rabbitmq:
-    image: rabbitmq:3-management
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
     ports:
       - "5672:5672"
-      - "15672:15672" # Giao diện quản lý của RabbitMQ
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - ticket-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - ticket-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==================== SERVICES ====================
+
+  identity-service:
+    build:
+      context: ./identity-service
+      dockerfile: Dockerfile
+    container_name: identity-service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/identity_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 123456
+      JWT_SECRET: "your-256-bit-secret-key-here-must-be-very-long-for-security"
+      JWT_EXPIRATION: 86400000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - ticket-network
+    restart: on-failure
+
+  ticketing-service:
+    build:
+      context: ./ticketing-service
+      dockerfile: Dockerfile
+    container_name: ticketing-service
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ticketing_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 123456
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      JWT_SECRET: "your-256-bit-secret-key-here-must-be-very-long-for-security"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ticket-network
+    restart: on-failure
+
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    container_name: notification-service
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_MAIL_USERNAME: lev160804clone@gmail.com
+      SPRING_MAIL_PASSWORD: ekcb dork uaok zafp
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - ticket-network
+    restart: on-failure
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      IDENTITY_SERVICE_URL: http://identity-service:8081
+      TICKETING_SERVICE_URL: http://ticketing-service:8082
+      JWT_SECRET: "your-256-bit-secret-key-here-must-be-very-long-for-security"
+    depends_on:
+      - identity-service
+      - ticketing-service
+    networks:
+      - ticket-network
+    restart: on-failure
+
+networks:
+  ticket-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
