@@ -20,6 +20,10 @@ public class Match {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    // Thêm vào Match.java
+    @Column(unique = true)
+    private Long externalId;    // ID từ football-data.org
+
     @Column(nullable = false)
     private String homeTeam;
 

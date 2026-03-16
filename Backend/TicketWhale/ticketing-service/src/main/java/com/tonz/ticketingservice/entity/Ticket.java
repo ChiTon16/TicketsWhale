@@ -22,14 +22,19 @@ public class Ticket {
     @JoinColumn(name = "booking_id", nullable = false)
     private Booking booking;
 
+    // ← Thêm quan hệ với Section
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seat_type_id", nullable = false)
+    @JoinColumn(name = "section_id")
+    private Section section;
+
+    // Giữ lại seatType để tương thích với code cũ (nullable)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seat_type_id")
     private SeatType seatType;
 
     @Column(nullable = false)
     private BigDecimal price;
 
-    // QR Code sẽ được generate sau khi thanh toán
     private String qrCode;
 
     @Enumerated(EnumType.STRING)

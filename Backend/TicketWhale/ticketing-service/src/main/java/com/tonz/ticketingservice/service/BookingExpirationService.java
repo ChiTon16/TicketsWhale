@@ -2,9 +2,11 @@ package com.tonz.ticketingservice.service;
 
 import com.tonz.ticketingservice.entity.Booking;
 import com.tonz.ticketingservice.entity.SeatType;
+import com.tonz.ticketingservice.entity.Section;
 import com.tonz.ticketingservice.entity.Ticket;
 import com.tonz.ticketingservice.repository.BookingRepository;
 import com.tonz.ticketingservice.repository.SeatTypeRepository;
+import com.tonz.ticketingservice.repository.SectionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -20,6 +22,7 @@ import java.util.List;
 public class BookingExpirationService {
 
     private final BookingRepository bookingRepository;
+    private final SectionRepository sectionRepository;
     private final SeatTypeRepository seatTypeRepository;
 
     // Chạy mỗi 1 phút để kiểm tra booking hết hạn
@@ -31,23 +34,28 @@ public class BookingExpirationService {
 
         if (expiredBookings.isEmpty()) return;
 
-        log.info("Found {} expired bookings, processing...", expiredBookings.size());
-
         for (Booking booking : expiredBookings) {
-            // Hoàn trả số vé về pool
             Ticket firstTicket = booking.getTickets().get(0);
-            SeatType seatType = seatTypeRepository
-                    .findByIdWithLock(firstTicket.getSeatType().getId())
-                    .orElseThrow();
 
-            int refundCount = booking.getTickets().size();
-            seatType.setAvailableSeats(seatType.getAvailableSeats() + refundCount);
+            // ← Kiểm tra section hoặc seatType
+            if (firstTicket.getSection() != null) {
+                Section section = sectionRepository
+                        .findByIdWithLock(firstTicket.getSection().getId())
+                        .orElseThrow();
+                section.setAvailableSeats(
+                        section.getAvailableSeats() + booking.getTickets().size());
+            } else if (firstTicket.getSeatType() != null) {
+                SeatType seatType = seatTypeRepository
+                        .findByIdWithLock(firstTicket.getSeatType().getId())
+                        .orElseThrow();
+                seatType.setAvailableSeats(
+                        seatType.getAvailableSeats() + booking.getTickets().size());
+            }
 
-            // Cập nhật trạng thái
             booking.setStatus(Booking.BookingStatus.EXPIRED);
             booking.getTickets().forEach(t -> t.setStatus(Ticket.TicketStatus.CANCELLED));
 
-            log.info("Expired booking: {}, refunded {} seats", booking.getId(), refundCount);
+            log.info("Expired booking: {}", booking.getId());
         }
     }
 }

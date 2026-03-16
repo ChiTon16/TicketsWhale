@@ -39,3 +39,7 @@ app:
       booking-cancelled: booking.cancelled
   booking:
     hold-duration-minutes: 10
+  football-api:
+    url: https://api.football-data.org/v4
+    api-key: 7cb745a092c9421eb8ffb7c7a4e79ca5
+    competition: PL    # Premier League

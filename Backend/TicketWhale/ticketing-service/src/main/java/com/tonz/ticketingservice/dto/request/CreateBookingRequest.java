@@ -16,16 +16,12 @@ public class CreateBookingRequest {
     @NotNull(message = "matchId không được để trống")
     private UUID matchId;
 
-    @NotNull(message = "seatTypeId không được để trống")
-    private UUID seatTypeId;
+    @NotNull(message = "sectionId không được để trống")
+    private UUID sectionId;      // ← chọn block/section
 
     @Min(value = 1, message = "Số lượng vé phải ít nhất là 1")
     private int quantity;
 
-    @NotBlank(message = "Email không được để trống")
-    @Email
     private String userEmail;
-
-    @NotBlank(message = "Họ tên không được để trống")
     private String userFullName;
 }

@@ -12,10 +12,24 @@ spring:
           predicates:
             - Path=/api/v1/auth/**
 
-        - id: ticketing-service
+        - id: ticketing-service-bookings
           uri: ${TICKETING_SERVICE_URL:http://localhost:8082}
           predicates:
             - Path=/api/v1/bookings/**
+          filters:
+            - JwtAuthentication
+
+        - id: ticketing-service-matches
+          uri: ${TICKETING_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/v1/matches/**
+          filters:
+            - JwtAuthentication
+
+        - id: admin-routes
+          uri: ${TICKETING_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/v1/admin/**
           filters:
             - JwtAuthentication
 
