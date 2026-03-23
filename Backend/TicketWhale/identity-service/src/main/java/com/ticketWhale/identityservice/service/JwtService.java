@@ -20,6 +20,9 @@ public class JwtService {
     @Value("${jwt.expiration}")
     private long expiration;
 
+    @Value("${jwt.refresh-expiration}")
+    private long refreshExpiration;
+
     public String generateToken(User user) {
         return Jwts.builder()
                 .setSubject(user.getEmail())
@@ -29,6 +32,16 @@ public class JwtService {
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    // ✅ Thêm method tạo refresh token (random string, không phải JWT)
+    public String generateRefreshToken() {
+        return java.util.UUID.randomUUID().toString() +
+                java.util.UUID.randomUUID().toString();
+    }
+
+    public long getRefreshExpirationMs() {
+        return refreshExpiration;
     }
 
     public Claims extractClaims(String token) {

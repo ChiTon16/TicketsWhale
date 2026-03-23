@@ -17,4 +17,6 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
     // Tìm các booking PENDING đã hết hạn để tự động hủy
     @Query("SELECT b FROM Booking b WHERE b.status = 'PENDING' AND b.expiresAt < :now")
     List<Booking> findExpiredBookings(LocalDateTime now);
+
+    List<Booking> findByUserIdOrderByCreatedAtDesc(UUID userId);
 }

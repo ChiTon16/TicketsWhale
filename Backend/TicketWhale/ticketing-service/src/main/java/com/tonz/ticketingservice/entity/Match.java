@@ -30,6 +30,16 @@ public class Match {
     @Column(nullable = false)
     private String awayTeam;
 
+    // Thêm vào Match.java
+    @Column
+    private String homeCrest;     // URL logo đội nhà
+    @Column
+    private String awayCrest;     // URL logo đội khách
+    @Column
+    private String competitionEmblem;  // Logo Premier League
+    @Column
+    private Integer matchday;     // Vòng đấu thứ mấy
+
     @Column(nullable = false)
     private LocalDateTime matchTime;
 
@@ -41,8 +51,11 @@ public class Match {
     @JoinColumn(name = "stadium_id", nullable = false)
     private Stadium stadium;
 
-    @OneToMany(mappedBy = "match", cascade = CascadeType.ALL)
-    private List<SeatType> seatTypes;
+    // Match.java
+    @OneToMany(mappedBy = "match",
+            cascade = CascadeType.ALL,      // ← tự xóa sections khi xóa match
+            orphanRemoval = true)
+    private List<Section> sections;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

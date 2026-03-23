@@ -4,10 +4,12 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "sections")
+@Table(name = "sections",
+        indexes = @Index(name = "idx_match_id", columnList = "match_id"))
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -33,7 +35,13 @@ public class Section {
     @Column(nullable = false)
     private int availableSeats;   // ← Pessimistic Lock cái này
 
+    @OneToMany(mappedBy = "section",
+            cascade = CascadeType.ALL,      // ← tự xóa blocks khi xóa section
+            orphanRemoval = true)
+    private List<Block> blocks;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "match_id", nullable = false)
     private Match match;
+
 }

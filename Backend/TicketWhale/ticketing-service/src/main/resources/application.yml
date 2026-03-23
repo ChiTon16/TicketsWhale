@@ -28,6 +28,15 @@ spring:
 jwt:
   secret: ${JWT_SECRET:your-256-bit-secret-key-here-must-be-very-long-for-security}
 
+vnpay:
+  url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+    # ← Trỏ thẳng về backend callback qua ngrok
+  return-url: https://unrodded-jayme-unappreciably.ngrok-free.dev/api/v1/payments/vnpay/callback
+    # Frontend URL dùng riêng sau này
+  frontend-url: http://localhost:5173/payment/result
+  tmn-code: ${VNPAY_TMN_CODE:MLD6BFSF}
+  hash-secret: ${VNPAY_HASH_SECRET:C1LB8AXS24QDVIWQ06LDY0KOPLHWTZUI}
+
 app:
   rabbitmq:
     exchange: ticket.exchange
@@ -41,5 +50,9 @@ app:
     hold-duration-minutes: 10
   football-api:
     url: https://api.football-data.org/v4
-    api-key: 7cb745a092c9421eb8ffb7c7a4e79ca5
+    api-key: ${FOOTBALL_API_KEY:}
     competition: PL    # Premier League
+  gemini:
+    api-key: ${GROQ_API_KEY:}
+  newsapi:
+    api-key: ${NEWS_API_KEY:}

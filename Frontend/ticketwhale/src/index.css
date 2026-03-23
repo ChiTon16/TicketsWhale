@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+@layer utilities {
+  .hero-gradient {
+    background: linear-gradient(135deg, #6082B6 0%, #7da2d9 100%);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes progress {
+  from {
+    width: 0%;
+  }
+
+  to {
+    width: 100%;
+  }
+}
+
+@theme {
+  /* ── Fonts ─────────────────────────────────────────────── */
+  --font-headline: "Plus Jakarta Sans", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-label: "Inter", sans-serif;
+
+  /* ── Border radius ─────────────────────────────────────── */
+  --radius-DEFAULT: 0.25rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-full: 9999px;
+
+  /* ── Surface & Background ──────────────────────────────── */
+  --color-background: #f9f9fc;
+  --color-surface: #f9f9fc;
+  --color-surface-bright: #f9f9fc;
+  --color-surface-dim: #dadadc;
+  --color-surface-variant: #e2e2e5;
+  --color-surface-tint: #6082B6;
+
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f3f3f6;
+  --color-surface-container: #eeeef0;
+  --color-surface-container-high: #e8e8ea;
+  --color-surface-container-highest: #e2e2e5;
+
+  /* ── On-Surface ────────────────────────────────────────── */
+  --color-on-background: #1a1c1e;
+  --color-on-surface: #1a1c1e;
+  --color-on-surface-variant: #404B58;
+  --color-inverse-surface: #2f3133;
+  --color-inverse-on-surface: #f0f0f3;
+
+  /* ── Primary ───────────────────────────────────────────── */
+  --color-primary: #6082B6;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #4670CB;
+  --color-on-primary-container: #fffbff;
+  --color-primary-fixed: #D8E2FF;
+  --color-primary-fixed-dim: #B1C5FF;
+  --color-on-primary-fixed: #001041;
+  --color-on-primary-fixed-variant: #16348B;
+  --color-inverse-primary: #B1C5FF;
+
+  /* ── Secondary ─────────────────────────────────────────── */
+  --color-secondary: #4B6E8D;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #AABFFF;
+  --color-on-secondary-container: #3C517A;
+  --color-secondary-fixed: #D8E2FF;
+  --color-secondary-fixed-dim: #B1C5FF;
+  --color-on-secondary-fixed: #0A1B39;
+  --color-on-secondary-fixed-variant: #344971;
+
+  /* ── Tertiary ──────────────────────────────────────────── */
+  --color-tertiary: #00694d;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #008562;
+  --color-on-tertiary-container: #f5fff8;
+  --color-tertiary-fixed: #84f8ca;
+  --color-tertiary-fixed-dim: #66dbaf;
+  --color-on-tertiary-fixed: #002116;
+  --color-on-tertiary-fixed-variant: #00513b;
+
+  /* ── Error ─────────────────────────────────────────────── */
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+
+  /* ── Outline ───────────────────────────────────────────── */
+  --color-outline: #707E8C;
+  --color-outline-variant: #BECBDF;
+}

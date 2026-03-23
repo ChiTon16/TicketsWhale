@@ -22,11 +22,10 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j // tự động taạo logger
+@Slf4j
 public class BookingService {
 
     private final BookingRepository bookingRepository;
-    private final SeatTypeRepository seatTypeRepository;
     private final MatchRepository matchRepository;
     private final SectionRepository sectionRepository;
     private final NotificationPublisher notificationPublisher;
@@ -34,7 +33,6 @@ public class BookingService {
     @Value("${app.booking.hold-duration-minutes:10}")
     private int holdDurationMinutes;
 
-    // ⭐ @Transactional bắt buộc để Pessimistic Lock hoạt động
     @Transactional
     public BookingResponse createBooking(UUID userId, CreateBookingRequest request) {
 
@@ -47,7 +45,6 @@ public class BookingService {
                     "MATCH_NOT_AVAILABLE", "Trận đấu không còn nhận đặt vé");
         }
 
-        // ⭐ Pessimistic Lock section
         Section section = sectionRepository.findByIdWithLock(request.getSectionId())
                 .orElseThrow(() -> new AppException(
                         HttpStatus.NOT_FOUND, "SECTION_NOT_FOUND", "Khu vực không tồn tại"));
@@ -57,7 +54,6 @@ public class BookingService {
                     "Không đủ vé. Còn lại: " + section.getAvailableSeats());
         }
 
-        // Trừ số ghế available
         section.setAvailableSeats(section.getAvailableSeats() - request.getQuantity());
 
         BigDecimal totalAmount = section.getPrice()
@@ -74,7 +70,7 @@ public class BookingService {
         for (int i = 0; i < request.getQuantity(); i++) {
             tickets.add(Ticket.builder()
                     .booking(booking)
-                    .section(section)    // ← gắn với section
+                    .section(section)
                     .price(section.getPrice())
                     .status(Ticket.TicketStatus.PENDING)
                     .build());
@@ -83,7 +79,6 @@ public class BookingService {
 
         Booking savedBooking = bookingRepository.save(booking);
 
-        // Publish event
         notificationPublisher.publishBookingConfirmed(
                 BookingNotificationMessage.builder()
                         .bookingId(savedBooking.getId())
@@ -93,7 +88,7 @@ public class BookingService {
                         .matchName(match.getHomeTeam() + " vs " + match.getAwayTeam())
                         .matchTime(match.getMatchTime().toString())
                         .stadiumName(match.getStadium().getName())
-                        .seatTypeName(section.getStand() + " - Block " + section.getName())
+                        .seatTypeName(section.getStand() + " - " + section.getName())
                         .quantity(request.getQuantity())
                         .totalAmount(totalAmount)
                         .eventType("BOOKING_CONFIRMED")
@@ -103,7 +98,6 @@ public class BookingService {
         return toBookingResponse(savedBooking);
     }
 
-    // Hủy booking và hoàn trả vé
     @Transactional
     public void cancelBooking(UUID bookingId, UUID userId) {
         Booking booking = bookingRepository.findById(bookingId)
@@ -121,12 +115,15 @@ public class BookingService {
                     "Chỉ có thể hủy booking đang PENDING");
         }
 
-        // Hoàn trả số vé
+        // Hoàn trả số ghế về section
         Ticket firstTicket = booking.getTickets().get(0);
-        SeatType seatType = seatTypeRepository.findByIdWithLock(
-                firstTicket.getSeatType().getId()).orElseThrow();
-        seatType.setAvailableSeats(
-                seatType.getAvailableSeats() + booking.getTickets().size());
+        if (firstTicket.getSection() != null) {
+            Section section = sectionRepository
+                    .findByIdWithLock(firstTicket.getSection().getId())
+                    .orElseThrow();
+            section.setAvailableSeats(
+                    section.getAvailableSeats() + booking.getTickets().size());
+        }
 
         booking.setStatus(Booking.BookingStatus.CANCELLED);
         booking.getTickets().forEach(t -> t.setStatus(Ticket.TicketStatus.CANCELLED));
@@ -140,7 +137,8 @@ public class BookingService {
                         HttpStatus.NOT_FOUND, "BOOKING_NOT_FOUND", "Booking không tồn tại"));
 
         if (!booking.getUserId().equals(userId)) {
-            throw new AppException(HttpStatus.FORBIDDEN, "ACCESS_DENIED", "Không có quyền truy cập");
+            throw new AppException(
+                    HttpStatus.FORBIDDEN, "ACCESS_DENIED", "Không có quyền truy cập");
         }
 
         return toBookingResponse(booking);
@@ -150,21 +148,37 @@ public class BookingService {
         List<TicketResponse> ticketResponses = booking.getTickets().stream()
                 .map(t -> TicketResponse.builder()
                         .id(t.getId())
-                        // ← Kiểm tra section trước, fallback về seatType
-                        .seatTypeId(t.getSection() != null
-                                ? t.getSection().getId()
-                                : t.getSeatType() != null
-                                ? t.getSeatType().getId()
-                                : null)
-                        .seatTypeName(t.getSection() != null
-                                ? t.getSection().getStand() + " - Block " + t.getSection().getName()
-                                : t.getSeatType() != null
-                                ? t.getSeatType().getName()
+                        .sectionId(t.getSection() != null
+                                ? t.getSection().getId() : null)
+                        .sectionName(t.getSection() != null
+                                ? t.getSection().getStand() + " - " + t.getSection().getName()
                                 : "N/A")
                         .price(t.getPrice())
                         .status(t.getStatus())
                         .build())
                 .toList();
+
+        // Lấy match info từ section → match
+        BookingResponse.MatchInfo matchInfo = null;
+        if (!booking.getTickets().isEmpty()
+                && booking.getTickets().get(0).getSection() != null) {
+
+            Section section = booking.getTickets().get(0).getSection();
+            Match match = section.getMatch();
+
+            if (match != null) {
+                matchInfo = BookingResponse.MatchInfo.builder()
+                        .id(match.getId())
+                        .homeTeam(match.getHomeTeam())
+                        .awayTeam(match.getAwayTeam())
+                        .homeCrest(match.getHomeCrest())
+                        .awayCrest(match.getAwayCrest())
+                        .matchTime(match.getMatchTime())
+                        .stadiumName(match.getStadium() != null
+                                ? match.getStadium().getName() : null)
+                        .build();
+            }
+        }
 
         return BookingResponse.builder()
                 .id(booking.getId())
@@ -173,7 +187,16 @@ public class BookingService {
                 .status(booking.getStatus())
                 .expiresAt(booking.getExpiresAt())
                 .createdAt(booking.getCreatedAt())
+                .paidAt(booking.getPaidAt())
                 .tickets(ticketResponses)
+                .match(matchInfo)          // ← thêm
                 .build();
+    }
+
+    public List<BookingResponse> getBookingHistory(UUID userId) {
+        return bookingRepository.findByUserIdOrderByCreatedAtDesc(userId)
+                .stream()
+                .map(this::toBookingResponse)
+                .toList();
     }
 }

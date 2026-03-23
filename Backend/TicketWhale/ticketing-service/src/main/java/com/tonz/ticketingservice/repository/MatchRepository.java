@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -17,4 +18,6 @@ public interface MatchRepository extends JpaRepository<Match, UUID> {
             LocalDateTime time, Match.MatchStatus status);
 
     List<Match> findByStatus(Match.MatchStatus status);
+
+    Optional<Match> findByExternalId(Long externalId);
 }

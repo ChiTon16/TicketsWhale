@@ -41,6 +41,12 @@ public class Booking {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    @Column(unique = true)
+    private String paymentCode;    // Mã thanh toán unique
+
+    @Column
+    private LocalDateTime paidAt;  // Thời gian thanh toán
+
     public enum BookingStatus {
         PENDING,    // Đang giữ chỗ, chờ thanh toán
         CONFIRMED,  // Đã thanh toán thành công

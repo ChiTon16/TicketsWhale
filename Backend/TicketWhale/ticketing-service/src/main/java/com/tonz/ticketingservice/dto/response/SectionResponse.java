@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -15,4 +16,5 @@ public class SectionResponse {
     private BigDecimal price;
     private int totalSeats;
     private int availableSeats;
+    private List<BlockResponse> blocks;   // ← thêm
 }

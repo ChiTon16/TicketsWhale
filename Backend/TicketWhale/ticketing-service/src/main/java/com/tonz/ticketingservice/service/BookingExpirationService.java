@@ -1,11 +1,9 @@
 package com.tonz.ticketingservice.service;
 
 import com.tonz.ticketingservice.entity.Booking;
-import com.tonz.ticketingservice.entity.SeatType;
 import com.tonz.ticketingservice.entity.Section;
 import com.tonz.ticketingservice.entity.Ticket;
 import com.tonz.ticketingservice.repository.BookingRepository;
-import com.tonz.ticketingservice.repository.SeatTypeRepository;
 import com.tonz.ticketingservice.repository.SectionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +21,6 @@ public class BookingExpirationService {
 
     private final BookingRepository bookingRepository;
     private final SectionRepository sectionRepository;
-    private final SeatTypeRepository seatTypeRepository;
 
     // Chạy mỗi 1 phút để kiểm tra booking hết hạn
     @Scheduled(fixedRate = 60000)
@@ -44,12 +41,6 @@ public class BookingExpirationService {
                         .orElseThrow();
                 section.setAvailableSeats(
                         section.getAvailableSeats() + booking.getTickets().size());
-            } else if (firstTicket.getSeatType() != null) {
-                SeatType seatType = seatTypeRepository
-                        .findByIdWithLock(firstTicket.getSeatType().getId())
-                        .orElseThrow();
-                seatType.setAvailableSeats(
-                        seatType.getAvailableSeats() + booking.getTickets().size());
             }
 
             booking.setStatus(Booking.BookingStatus.EXPIRED);

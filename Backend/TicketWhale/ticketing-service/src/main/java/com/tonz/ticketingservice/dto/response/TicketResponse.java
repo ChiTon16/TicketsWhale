@@ -11,8 +11,8 @@ import java.util.UUID;
 @Builder
 public class TicketResponse {
     private UUID id;
-    private UUID seatTypeId;
-    private String seatTypeName;
+    private UUID sectionId;      // ← đổi từ seatTypeId
+    private String sectionName;  // ← đổi từ seatTypeName
     private BigDecimal price;
     private Ticket.TicketStatus status;
 }

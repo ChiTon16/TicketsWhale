@@ -23,8 +23,6 @@ spring:
           uri: ${TICKETING_SERVICE_URL:http://localhost:8082}
           predicates:
             - Path=/api/v1/matches/**
-          filters:
-            - JwtAuthentication
 
         - id: admin-routes
           uri: ${TICKETING_SERVICE_URL:http://localhost:8082}
@@ -32,6 +30,38 @@ spring:
             - Path=/api/v1/admin/**
           filters:
             - JwtAuthentication
+
+        # ← Callback phải đứng TRƯỚC payment-routes
+        - id: payment-callback
+          uri: ${TICKETING_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/v1/payments/vnpay/callback
+
+
+        # Payment tạo URL - cần JWT
+        - id: payment-routes
+          uri: ${TICKETING_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/v1/payments/**
+          filters:
+            - JwtAuthentication
+
+        - id: ticket-qr-route
+          uri: ${TICKETING_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/v1/payments/ticket-qr/**
+          filters:
+            - JwtAuthentication
+
+        - id: stadiums
+          uri: ${TICKETING_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/v1/stadiums/**
+
+        - id: stadiums
+          uri: ${TICKETING_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/v1/news
 
 jwt:
   secret: ${JWT_SECRET:your-256-bit-secret-key-here-must-be-very-long-for-security}

@@ -27,11 +27,6 @@ public class Ticket {
     @JoinColumn(name = "section_id")
     private Section section;
 
-    // Giữ lại seatType để tương thích với code cũ (nullable)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seat_type_id")
-    private SeatType seatType;
-
     @Column(nullable = false)
     private BigDecimal price;
 

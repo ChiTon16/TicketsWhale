@@ -1,21 +1,22 @@
 package com.tonz.ticketingservice.repository;
 
-import com.tonz.ticketingservice.entity.SeatType;
+import com.tonz.ticketingservice.entity.Block;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface SeatTypeRepository extends JpaRepository<SeatType, UUID> {
+public interface BlockRepository extends JpaRepository<Block, UUID> {
 
-    // ⭐ PESSIMISTIC LOCK - đây là kỹ thuật chống overbooking
-    // SELECT ... FOR UPDATE - lock row này lại cho đến khi transaction xong
+    List<Block> findBySectionId(UUID sectionId);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT s FROM SeatType s WHERE s.id = :id")
-    Optional<SeatType> findByIdWithLock(UUID id);
+    @Query("SELECT b FROM Block b WHERE b.id = :id")
+    Optional<Block> findByIdWithLock(UUID id);
 }

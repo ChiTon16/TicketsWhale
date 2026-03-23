@@ -18,5 +18,19 @@ public class BookingResponse {
     private Booking.BookingStatus status;
     private LocalDateTime expiresAt;
     private LocalDateTime createdAt;
+    private LocalDateTime paidAt;
     private List<TicketResponse> tickets;
+    private MatchInfo match;            // ← thêm
+
+    @Getter
+    @Builder
+    public static class MatchInfo {
+        private UUID id;
+        private String homeTeam;
+        private String awayTeam;
+        private String homeCrest;
+        private String awayCrest;
+        private LocalDateTime matchTime;
+        private String stadiumName;
+    }
 }

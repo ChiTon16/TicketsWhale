@@ -14,8 +14,9 @@ public class FootballMatchResponse {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class MatchDto {
         private Long id;
-        private String utcDate;      // "2026-03-21T15:00:00Z"
-        private String status;       // SCHEDULED, FINISHED, CANCELLED
+        private String utcDate;
+        private String status;
+        private Integer matchday;    // ← thêm
         private TeamDto homeTeam;
         private TeamDto awayTeam;
         private VenueDto venue;
@@ -27,6 +28,7 @@ public class FootballMatchResponse {
         private Long id;
         private String name;         // "Arsenal FC"
         private String shortName;    // "Arsenal"
+        private String crest;        // ← thêm URL logo
     }
 
     @Data
