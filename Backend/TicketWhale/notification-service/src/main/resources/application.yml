@@ -1,5 +1,5 @@
 server:
-  port: 8083
+  port: ${PORT:8083}
 
 spring:
   application:
@@ -7,8 +7,8 @@ spring:
   rabbitmq:
     host: ${SPRING_RABBITMQ_HOST:localhost}
     port: ${SPRING_RABBITMQ_PORT:5672}
-    username: guest
-    password: guest
+    username: ${SPRING_RABBITMQ_USERNAME:guest}
+    password: ${SPRING_RABBITMQ_PASSWORD:guest}
   mail:
     host: smtp.gmail.com
     port: 587

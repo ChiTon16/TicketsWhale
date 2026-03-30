@@ -1,13 +1,15 @@
 server:
-  port: 8082
+  port: ${PORT:8082}
 
 spring:
   application:
     name: ticketing-service
+
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/ticketing_db}
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:123456}
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -15,27 +17,28 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
   rabbitmq:
-    host: ${SPRING_RABBITMQ_HOST:localhost}
-    port: ${SPRING_RABBITMQ_PORT:5672}
-    username: ${SPRING_RABBITMQ_USERNAME:guest}
-    password: ${SPRING_RABBITMQ_PASSWORD:guest}
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+
   data:
     redis:
-      host: ${SPRING_DATA_REDIS_HOST:localhost}
-      port: ${SPRING_DATA_REDIS_PORT:6379}
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
 
 jwt:
-  secret: ${JWT_SECRET:your-256-bit-secret-key-here-must-be-very-long-for-security}
+  secret: ${JWT_SECRET}
 
 vnpay:
   url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
-    # ← Trỏ thẳng về backend callback qua ngrok
-  return-url: https://unrodded-jayme-unappreciably.ngrok-free.dev/api/v1/payments/vnpay/callback
-    # Frontend URL dùng riêng sau này
-  frontend-url: http://localhost:5173/payment/result
-  tmn-code: ${VNPAY_TMN_CODE:MLD6BFSF}
-  hash-secret: ${VNPAY_HASH_SECRET:C1LB8AXS24QDVIWQ06LDY0KOPLHWTZUI}
+  return-url: ${VNPAY_RETURN_URL}
+  frontend-url: ${FRONTEND_URL}
+  tmn-code: ${VNPAY_TMN_CODE}
+  hash-secret: ${VNPAY_HASH_SECRET}
 
 app:
   rabbitmq:
@@ -46,13 +49,17 @@ app:
     routing-key:
       booking-confirmed: booking.confirmed
       booking-cancelled: booking.cancelled
+
   booking:
     hold-duration-minutes: 10
+
   football-api:
     url: https://api.football-data.org/v4
-    api-key: ${FOOTBALL_API_KEY:}
-    competition: PL    # Premier League
+    api-key: ${FOOTBALL_API_KEY}
+    competition: PL
+
   gemini:
-    api-key: ${GROQ_API_KEY:}
+    api-key: ${GROQ_API_KEY}
+
   newsapi:
-    api-key: ${NEWS_API_KEY:}
+    api-key: ${NEWS_API_KEY}

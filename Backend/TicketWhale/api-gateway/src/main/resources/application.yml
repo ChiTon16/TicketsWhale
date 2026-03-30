@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 spring:
   application:
@@ -58,7 +58,7 @@ spring:
           predicates:
             - Path=/api/v1/stadiums/**
 
-        - id: stadiums
+        - id: news
           uri: ${TICKETING_SERVICE_URL:http://localhost:8082}
           predicates:
             - Path=/api/v1/news
