@@ -6,9 +6,9 @@ spring:
     name: ticketing-service
 
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${SPRING_DATASOURCE_URL}        # ← đổi từ DB_URL
+    username: ${SPRING_DATASOURCE_USERNAME}  # ← đổi từ DB_USERNAME
+    password: ${SPRING_DATASOURCE_PASSWORD}  # ← đổi từ DB_PASSWORD
 
   jpa:
     hibernate:
@@ -19,16 +19,11 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
   rabbitmq:
-    host: ${RABBITMQ_HOST}
-    port: ${RABBITMQ_PORT}
-    username: ${RABBITMQ_USERNAME}
-    password: ${RABBITMQ_PASSWORD}
+    addresses: ${SPRING_RABBITMQ_URI}
 
   data:
     redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
-      password: ${REDIS_PASSWORD}
+      url: ${SPRING_DATA_REDIS_URL}
 
 jwt:
   secret: ${JWT_SECRET}
