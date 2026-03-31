@@ -6,9 +6,9 @@ spring:
     name: ticketing-service
 
   datasource:
-    url: ${SPRING_DATASOURCE_URL}        # ← đổi từ DB_URL
-    username: ${SPRING_DATASOURCE_USERNAME}  # ← đổi từ DB_USERNAME
-    password: ${SPRING_DATASOURCE_PASSWORD}  # ← đổi từ DB_PASSWORD
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres-ticketing:5432/railway}
+    username: ${SPRING_DATASOURCE_USERNAME:${DB_USERNAME}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD}}
 
   jpa:
     hibernate:
