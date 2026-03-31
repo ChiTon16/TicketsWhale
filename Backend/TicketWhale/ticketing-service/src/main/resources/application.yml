@@ -6,9 +6,9 @@ spring:
     name: ticketing-service
 
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${PGHOST}:${PGPORT:5432}/${PGDATABASE:railway}}
-    username: ${SPRING_DATASOURCE_USERNAME:${PGUSER:${DB_USERNAME}}}
-    password: ${SPRING_DATASOURCE_PASSWORD:${PGPASSWORD:${DB_PASSWORD}}}
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
   jpa:
     hibernate:
@@ -19,11 +19,16 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
   rabbitmq:
-    addresses: ${SPRING_RABBITMQ_URI}
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
 
   data:
     redis:
-      url: ${SPRING_DATA_REDIS_URL}
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
 
 jwt:
   secret: ${JWT_SECRET}
