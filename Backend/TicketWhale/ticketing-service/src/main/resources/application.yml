@@ -6,9 +6,9 @@ spring:
     name: ticketing-service
 
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres-ticketing:5432/railway}
-    username: ${SPRING_DATASOURCE_USERNAME:${DB_USERNAME}}
-    password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD}}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${PGHOST}:${PGPORT:5432}/${PGDATABASE:railway}}
+    username: ${SPRING_DATASOURCE_USERNAME:${PGUSER:${DB_USERNAME}}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${PGPASSWORD:${DB_PASSWORD}}}
 
   jpa:
     hibernate:
