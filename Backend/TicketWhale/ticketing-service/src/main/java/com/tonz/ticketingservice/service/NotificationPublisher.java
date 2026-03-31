@@ -24,8 +24,12 @@ public class NotificationPublisher {
     private String bookingCancelledKey;
 
     public void publishBookingConfirmed(BookingNotificationMessage message) {
-        rabbitTemplate.convertAndSend(exchange, bookingConfirmedKey, message);
-        log.info("Published booking confirmed event: {}", message.getBookingId());
+        try {
+            rabbitTemplate.convertAndSend(exchange, bookingConfirmedKey, message);
+            log.info("Published booking confirmed event: {}", message.getBookingId());
+        } catch (Exception e) {
+            log.error("Failed to publish booking confirmed", e);
+        }
     }
 
     public void publishBookingCancelled(BookingNotificationMessage message) {
