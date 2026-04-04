@@ -1,7 +1,12 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios'
 import type { ApiError, User } from '@/types'
 
-const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080'
+// const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080'
+const BASE_URL = import.meta.env.VITE_API_URL
+if (!BASE_URL) {
+    throw new Error('VITE_API_URL is not defined')
+}
+console.log('API URL:', BASE_URL)
 
 // ─── Storage helpers ──────────────────────────────────────
 export const storage = {
