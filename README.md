@@ -213,32 +213,3 @@ Stop the system:
 ```bash
 docker compose down
 ```
-
----
-
-Backend Flow
-
-
-Frontend
-   │
-   ▼
-API Gateway
-   │
-   ├──── Identity Service ──── PostgreSQL
-   │
-   └──── Ticketing Service ─── PostgreSQL
-                │
-                ├──── Redis
-                ├──── VNPay
-                ├──── External APIs
-                │
-                └──── RabbitMQ
-                         │
-                         ▼
-                 Notification Service
-                         │
-                         ▼
-                    Email + QR
-
-
-GitHub: https://github.com/ChiTon16
